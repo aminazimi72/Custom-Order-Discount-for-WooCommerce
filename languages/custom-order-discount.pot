@@ -1,0 +1,66 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Custom Order Discount\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-02 20:27+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.6; wp-6.4.1\n"
+"X-Domain: custom-order-discount"
+
+#. Author of the plugin
+msgid "Amin Azimi"
+msgstr ""
+
+#. Name of the plugin
+#: custom-order-discount.php:37 custom-order-discount.php:38
+msgid "Custom Order Discount"
+msgstr ""
+
+#: custom-order-discount.php:167
+msgid "Custom Order Discount requires WooCommerce to be installed and active."
+msgstr ""
+
+#: custom-order-discount.php:48
+msgid "Custom Order Discount Settings"
+msgstr ""
+
+#: custom-order-discount.php:103
+msgid "Discount Label"
+msgstr ""
+
+#: custom-order-discount.php:95
+msgid "Discount Percent"
+msgstr ""
+
+#: custom-order-discount.php:80
+msgid "Discount Settings"
+msgstr ""
+
+#: custom-order-discount.php:87
+msgid "Enable Discount"
+msgstr ""
+
+#: custom-order-discount.php:119
+msgid "Enter your discount settings below:"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://github.com/aminazimi72"
+msgstr ""
+
+#. Description of the plugin
+msgid "Set a custom order discount and show it in the cart and checkout page."
+msgstr ""
+
+#: custom-order-discount.php:111
+msgid "Success Notice"
+msgstr ""
