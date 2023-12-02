@@ -154,7 +154,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             $notice = get_option('custom_order_discount_notice');
 
             if ($enabled && !empty($notice)) {
-                wc_print_notice($notice, 'success');
+                wc_add_notice($notice, 'success');
             }
         }
     }
