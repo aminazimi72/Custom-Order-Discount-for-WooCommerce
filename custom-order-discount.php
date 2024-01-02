@@ -15,9 +15,11 @@ if (!defined('ABSPATH')) {
 // Check if WooCommerce is active
 if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 
-    class Custom_Order_Discount {
+    class Custom_Order_Discount
+    {
 
-        public function __construct() {
+        public function __construct()
+        {
             // Load translations
             add_action('plugins_loaded', array($this, 'load_textdomain'));
 
@@ -27,11 +29,13 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             add_action('woocommerce_before_cart', array($this, 'display_notice'));
         }
 
-        public function load_textdomain() {
+        public function load_textdomain()
+        {
             load_plugin_textdomain('custom-order-discount', false, dirname(plugin_basename(__FILE__)) . '/languages');
         }
 
-        public function add_plugin_page() {
+        public function add_plugin_page()
+        {
             add_submenu_page(
                 'woocommerce',
                 __('Custom Order Discount', 'custom-order-discount'),
@@ -42,8 +46,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             );
         }
 
-        public function create_admin_page() {
-            ?>
+        public function create_admin_page()
+        {
+?>
             <div class="wrap">
                 <h2><?php echo esc_html__('Custom Order Discount Settings', 'custom-order-discount'); ?></h2>
                 <form method="post" action="options.php">
@@ -54,10 +59,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                     ?>
                 </form>
             </div>
-            <?php
+<?php
         }
 
-        public function page_init() {
+        public function page_init()
+        {
             register_setting(
                 'custom_order_discount_settings',
                 'custom_order_discount_enabled'
@@ -75,6 +81,11 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 'custom_order_discount_notice'
             );
 
+            register_setting(
+                'custom_order_discount_settings',
+                'custom_order_discount_categories'
+            );
+
             add_settings_section(
                 'custom_order_discount_section',
                 __('Discount Settings', 'custom-order-discount'),
@@ -86,6 +97,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 'custom_order_discount_enabled',
                 __('Enable Discount', 'custom-order-discount'),
                 array($this, 'enable_discount_callback'),
+                'custom_order_discount',
+                'custom_order_discount_section'
+            );
+
+            add_settings_field(
+                'custom_order_discount_categories',
+                __('Discount Categories', 'custom-order-discount'),
+                array($this, 'categories_callback'),
                 'custom_order_discount',
                 'custom_order_discount_section'
             );
@@ -115,41 +134,63 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             );
         }
 
-        public function print_section_info() {
+        public function print_section_info()
+        {
             echo esc_html__('Enter your discount settings below:', 'custom-order-discount');
         }
 
-        public function enable_discount_callback() {
-            $enabled = (get_option('custom_order_discount_enabled',true) == 'on') ? 1 : 0;
+        public function enable_discount_callback()
+        {
+            $enabled = (get_option('custom_order_discount_enabled', true) == 'on') ? 1 : 0;
             echo '<input type="checkbox" name="custom_order_discount_enabled" ' . checked(1, $enabled, false) . ' />';
         }
 
-        public function percent_callback() {
+        public function percent_callback()
+        {
             $percent = get_option('custom_order_discount_percent');
             echo '<input type="number" name="custom_order_discount_percent" value="' . esc_attr($percent) . '" />';
         }
 
-        public function label_callback() {
+        public function label_callback()
+        {
             $label = get_option('custom_order_discount_label');
             echo '<input type="text" name="custom_order_discount_label" value="' . esc_attr($label) . '" />';
         }
 
-        public function notice_callback() {
+        public function notice_callback()
+        {
             $notice = get_option('custom_order_discount_notice');
             echo '<textarea name="custom_order_discount_notice" rows="3" cols="50">' . esc_attr($notice) . '</textarea>';
         }
 
-        public function apply_discount() {
+        public function apply_discount()
+        {
             $enabled = get_option('custom_order_discount_enabled');
             $percent = get_option('custom_order_discount_percent');
+            $selected_categories = get_option('custom_order_discount_categories', array());
 
             if ($enabled && $percent > 0) {
-                $discount = WC()->cart->subtotal * ($percent / 100);
+                $discount = 0;
+
+                foreach (WC()->cart->get_cart() as $cart_item) {
+                    $product_categories = get_the_terms($cart_item['product_id'], 'product_cat');
+
+                    if ($product_categories) {
+                        foreach ($product_categories as $category) {
+                            if (in_array($category->term_id, $selected_categories)) {
+                                $discount += $cart_item['line_subtotal'] * ($percent / 100);
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 WC()->cart->add_fee(get_option('custom_order_discount_label'), -$discount);
             }
         }
 
-        public function display_notice() {
+        public function display_notice()
+        {
             $enabled = get_option('custom_order_discount_enabled');
             $notice = get_option('custom_order_discount_notice');
 
@@ -157,13 +198,27 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 wc_add_notice($notice, 'success');
             }
         }
+
+        public function categories_callback()
+        {
+            $selected_categories = get_option('custom_order_discount_categories', array());
+            $categories = get_terms('product_cat');
+
+            echo '<select multiple="multiple" name="custom_order_discount_categories[]">';
+            foreach ($categories as $category) {
+                $selected = in_array($category->term_id, $selected_categories) ? 'selected="selected"' : '';
+                echo '<option value="' . esc_attr($category->term_id) . '" ' . $selected . '>' . esc_html($category->name) . '</option>';
+            }
+            echo '</select>';
+        }
     }
 
     new Custom_Order_Discount();
 } else {
     add_action('admin_notices', 'custom_order_discount_woocommerce_not_active');
 
-    function custom_order_discount_woocommerce_not_active() {
+    function custom_order_discount_woocommerce_not_active()
+    {
         echo '<div class="error"><p>' . __('Custom Order Discount requires WooCommerce to be installed and active.', 'custom-order-discount') . '</p></div>';
     }
 }
